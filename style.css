@@ -1,0 +1,47 @@
+body{
+    background-color: #F4F4F4;
+    font-family: "Menlo",Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+}
+
+#todo-container {
+    margin-top:20px;
+}
+
+.card {
+    border: none;
+}
+
+.card .header{
+    padding: 40px 0 20px;
+    text-align: center;
+}
+
+#todo-body{
+    margin-bottom: 20px;
+}
+
+.card .card-actions{
+    border-top: 2px solid #F4F4F4;
+    padding-top: 16px;
+}
+
+.task-item{
+    padding: .4rem 1.5rem;
+}
+
+.task-action{
+    display:block;
+    float:right;
+}
+
+.task-action svg{
+    width:20px;
+    height: 20px;
+    margin-left: 12px;
+    color: #D0D0D0;
+    cursor: pointer;
+}
+
+.task-action svg:hover{
+    color: #000;
+}
