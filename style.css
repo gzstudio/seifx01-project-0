@@ -1,10 +1,12 @@
-.text-secondary {
-    color: #ccc!important;
-}
+
 
 body{
     background-color: #F4F4F4;
     font-family: "Menlo",Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+}
+
+.text-secondary {
+    color: #ccc!important;
 }
 
 #todo-container {

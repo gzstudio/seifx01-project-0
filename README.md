@@ -1,5 +1,5 @@
 # seifx01-project-0
-###Project #0: Todo App
+## Project #0: Todo App  
 This is a simple todo app. This todo app only allow user to have maximum of 20 pending todos at any given moment. 
 
 **Basic functionalities (MVP)**  
