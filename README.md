@@ -6,12 +6,12 @@ This is a simple todo app.
 *Basic functionalities (MVP)*
 [x] display task(s) on the todo
 [x] add new task
-[ ] mark/unmark task as complete
-[ ] ability to see all the completed task
+[x] mark/unmark task as complete
+[x] ability to hide all the completed task
 [x] remove task
 [ ] edit task
-[ ] empty state when there is no task
-[ ] animation & styling
+[x] empty state when there is no task
+[ ] Prevent user from enter the same value
 
 *Advance functionalities*
 [ ] multiple todo(s)
@@ -20,8 +20,10 @@ This is a simple todo app.
 [ ] display % of subtask completed
 [ ] automatically mark task as complete once all the sub-tasks are completed
 [ ] ability to save to local storage
+[ ] animation & styling
 
 *Other ideas*
+[ ] limit items to max of 20
 [ ] assign / remove tag(s)
 [ ] filter by tag(s)
 [ ] assign due date to task

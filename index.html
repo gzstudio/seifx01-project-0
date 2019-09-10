@@ -15,35 +15,32 @@
                 <div class="header">
                     <h2>Todo Title</h2>
                 </div>
-                <form>
+                <form class="need-validation" novalidate>
                 <div class="input-group mb-3">
                     <input type="text" id="taskDescription" class="form-control" placeholder="What'd you like to do" aria-label="task-description" aria-describedby="add-task" required>
+
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" id="addTask">Add item</button>
+                        <button class="btn btn-outline-secondary" type="submit" id="addTask">Add item</button>
+                    </div>
+                    <div class="invalid-feedback">
+                        This item already exist in the list!
                     </div>
                 </div>  
                 </form>
                 <div id="todo-body">
-                    <div class="custom-control custom-checkbox task-item">
-                        <input type="checkbox" class="custom-control-input" id="task1">
-                        <label class="custom-control-label" for="task1">Decide which project to work on</label>
-                    </div>
-                    <div class="custom-control custom-checkbox task-item">
-                        <input type="checkbox" class="custom-control-input" id="task2">
-                        <label class="custom-control-label" for="task2">Decide which project to work on</label>
-                    </div>
+                    <h3 class="text-secondary text-center">This list is currently empty. <br/>Add some items :)</h3>
                 </div>
             </div>
             <div class="col-12 card-actions">
                 <div class="row">
                     <div class="col-4">
-                        <p id="numberTodo">x todo items</p>
+                        <p id="numberTodo">0 todo items</p>
                     </div>
                     <div class="col-4">
-                        <p>Hide completed items</p>
+                        <p class="text-center footer-link" id="hideComplete">Hide completed items</p>
                     </div>
                     <div class="col-4">
-                        <p>Clear completed [1]</p>
+                        <p class="text-right footer-link">Clear completed [1]</p>
                     </div>
                 </div>
             </div>   

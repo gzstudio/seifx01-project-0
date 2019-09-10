@@ -1,3 +1,7 @@
+.text-secondary {
+    color: #ccc!important;
+}
+
 body{
     background-color: #F4F4F4;
     font-family: "Menlo",Monaco,Consolas,"Liberation Mono","Courier New",monospace;
@@ -6,6 +10,7 @@ body{
 #todo-container {
     margin-top:20px;
 }
+
 
 .card {
     border: none;
@@ -17,7 +22,12 @@ body{
 }
 
 #todo-body{
-    margin-bottom: 20px;
+    margin: 20px 0;
+    min-height: 360px;
+}
+
+#todo-body h3{
+    padding: 16%;
 }
 
 .card .card-actions{
@@ -25,8 +35,17 @@ body{
     padding-top: 16px;
 }
 
+.invalid-feedback{
+    padding-left: 8px;
+}
+
 .task-item{
     padding: .4rem 1.5rem;
+}
+
+.completed label{
+    color:#D0D0D0;
+    text-decoration: line-through;
 }
 
 .task-action{
@@ -45,3 +64,12 @@ body{
 .task-action svg:hover{
     color: #000;
 }
+
+.footer-link{
+    cursor: pointer;
+}
+
+.footer-link:hover{
+    text-decoration: underline;
+}
+
