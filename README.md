@@ -1,6 +1,6 @@
 # seifx01-project-0
 
-This is a simple todo app. This todo app only allow user to have maximum of 20 pending todos at any given moment. 
+This is a dead simple todo lists app. This todo app only allow user to have maximum of 20 pending todos at any given moment. It meant to be super simple and let you focus on the items you need to get done. 
 
 **Basic functionalities (MVP)**  
 [x] display task(s) on the todo  
