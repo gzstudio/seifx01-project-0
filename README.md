@@ -1,5 +1,5 @@
 # seifx01-project-0
-## Project #0: Todo App  
+
 This is a simple todo app. This todo app only allow user to have maximum of 20 pending todos at any given moment. 
 
 **Basic functionalities (MVP)**  
@@ -10,19 +10,25 @@ This is a simple todo app. This todo app only allow user to have maximum of 20 p
 [x] remove task  
 [ ] edit task  
 [x] empty state when there is no task  
-[ ] Prevent user from enter the same value  
 
-**Advance functionalities** 
+
+**Edge Cases**  
+[ ] limit items to max of 20  
+[ ] prevent user from enter the same value  
+[x] prevent user from create empty task
+
+**Advance functionalities**  
+[ ] in-place edit  
 [ ] multiple todo(s)  
+[ ] ability to archive todo(s)  
 [ ] reordering of task  
 [ ] add sub-tasks  
-[ ] display % of subtask completed  
-[ ] automatically mark task as complete once all the sub-tasks are completed  
-[ ] ability to save to local storage / firebase
-[ ] animation & styling  
+[ ] display % of subtask completed   
+[ ] automatically mark task as complete once all the sub-tasks are completed   
+[ ] ability to save to local storage / firebase  
+[ ] animation & styling   
 
 **Other ideas**  
-[ ] limit items to max of 20  
 [ ] assign / remove tag(s)  
 [ ] filter by tag(s)  
 [ ] assign due date to task  
