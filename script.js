@@ -1,6 +1,7 @@
 let numOfPendingTodo = 0;
 let numOfDoneTodo = 0;
 
+
 const todo = {
   tasks: [],
   completedTasks: [],
@@ -18,7 +19,11 @@ const todo = {
 $(`#addTask`).click(function(event) {
   event.preventDefault();
   let taskDescription = $("#taskDescription").val();
-  if (taskDescription.length > 0) {
+
+  $(`.invalid-feedback`).css("visibility", "hidden");
+  $(`#taskDescription`).removeClass("is-invalid");
+  let isError = catchInvalidInput(taskDescription);
+  if (taskDescription.length > 0 && isError === true) {
     todo.addTask($("#taskDescription").val());
     let taskWrapper = `
         <div id="taskWrapper-${todo.tasks.length}" class="custom-control custom-checkbox task-item">
@@ -33,6 +38,28 @@ $(`#addTask`).click(function(event) {
   }
   $("#taskDescription").val("");
 });
+
+function catchInvalidInput(taskDescription) {
+    try {
+        if (taskDescription.length === 0) {
+            throw `Can't add an empty item..duhhh`;
+        }
+        for (i=0; i < todo.tasks.length; i++) {
+            if (todo.tasks[i].description === taskDescription) {
+                throw `This task already exist`;        
+            }
+        }
+    }
+    catch(err) {
+        console.log(err);
+        $(`.invalid-feedback`).html(err);
+        $(`#taskDescription`).addClass("is-invalid");
+        $(`.invalid-feedback`).css("visibility", "visible");
+        return false;
+    }
+    return true;
+}
+
 
 $("#hideComplete").click(function() {
   $(`#todo-body`)
@@ -49,6 +76,20 @@ $("#hideComplete").click(function() {
   }
 });
 
+$("#clearComplete").click(function() {
+    let i = 0;
+    while(i < todo.tasks.length) {
+        if(todo.tasks[i].isDone === true) {
+            todo.tasks.splice(i, 1);
+        }
+        i++;
+    }
+    upDateTodoCounter();
+    $(`#todo-body`)
+        .find(`.completed`)
+        .remove();
+});
+
 $(document).on("click", ".feather-trash-2", function() {
   let val = $(this)
     .closest(`.task-item`)
@@ -61,6 +102,15 @@ $(document).on("click", ".feather-trash-2", function() {
     .closest(`.task-item`)
     .remove();
 });
+
+$(document).on("click", ".feather-edit-2", function() {
+    let currentVal = $(this)
+    .closest(`.task-item`)
+    .find(`span`)
+    .text();
+    console.log(currentVal);
+});
+
 
 $(document).on("change", ":checkbox", function() {
   let val = $(this)
@@ -96,5 +146,6 @@ function upDateTodoCounter() {
   }).length;
   numOfPendingTodo = todo.tasks.length - numOfDoneTodo;
   $(`#numberTodo`).html(`${numOfPendingTodo} todo items`);
+  $(`#clearComplete`).html(`Clear complete [${numOfDoneTodo}]`);
   return numOfDoneTodo, numOfPendingTodo;
 }

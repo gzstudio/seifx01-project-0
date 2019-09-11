@@ -24,7 +24,7 @@ body{
 }
 
 #todo-body{
-    margin: 20px 0;
+    margin: -10px 0 20px;
     min-height: 360px;
 }
 
@@ -75,3 +75,10 @@ body{
     text-decoration: underline;
 }
 
+.invalid-feedback {
+    visibility: hidden;
+    display: block;
+}
+.form-control.is-invalid{
+    background-image: none;
+}

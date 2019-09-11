@@ -14,13 +14,13 @@ This is a dead simple todo lists app. This todo app only allow user to have maxi
 
 **Edge Cases**  
 [ ] limit items to max of 20  
-[ ] prevent user from enter the same value  
+[x] prevent user from enter the same value  
 [x] prevent user from create empty task
 
 **Advance functionalities**  
-[ ] in-place edit  
 [ ] multiple todo(s)  
 [ ] ability to archive todo(s)  
+[ ] in-place edit  
 [ ] reordering of task  
 [ ] add sub-tasks  
 [ ] display % of subtask completed   
