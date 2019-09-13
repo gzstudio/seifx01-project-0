@@ -19,6 +19,7 @@ const todo = {
 
 // add list
 
+
 // add task
 $(`#addTask`).click(function(event) {
   event.preventDefault();
@@ -198,9 +199,8 @@ function updateTodoCounter() {
 // hide complete
 $("#hideComplete").click(function() {
     $(`#todo-body`).find(`.completed`).parent().toggleClass(`d-none`);
-
-    if ($(`#todo-body`).find(`.completed`).hasClass(`d-none`)) {
-      $(`#hideComplete`).text(`Show completed`);
+    if ($(`#todo-body`).find(`.completed`).parent().hasClass(`d-none`)) {
+        $(`#hideComplete`).text(`Show completed`);
     } else {
         $(`#hideComplete`).text(`Hide completed`);
     }
