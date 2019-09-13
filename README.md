@@ -13,9 +13,9 @@ This is a dead simple todo lists app. This todo app only allow user to have maxi
 
 
 **Edge Cases**  
-[ ] grammars (singular / plural)  
+[x] grammars (singular / plural)  
 [x] only display hide completed items / clear completed items when there are items  
-[ ] limit items to max of 20  
+[x] limit items to max of 20  
 [x] prevent user from enter the same value  
 [x] prevent user from create empty task   
 [ ] optimised styling on mobile   

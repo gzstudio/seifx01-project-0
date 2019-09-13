@@ -1,5 +1,6 @@
 let numOfPendingTodo = 0;
 let numOfDoneTodo = 0;
+let editCount = 0;
 
 // declare object todo
 const todo = {
@@ -16,6 +17,7 @@ const todo = {
   }
 };
 
+// add list
 
 // add task
 $(`#addTask`).click(function(event) {
@@ -47,13 +49,16 @@ $(`#addTask`).click(function(event) {
 // catch invalid input
 function catchInvalidInput(taskDescription) {
     try {
-        if (taskDescription.length === 0) {
+        if (taskDescription.length === 0 || taskDescription === ` `) {
             throw "Can't add an empty item..duhhh";
         }
         for (i=0; i < todo.tasks.length; i++) {
             if (todo.tasks[i].description === taskDescription) {
                 throw "This task already exist";        
             }
+        }
+        if (numOfPendingTodo > 20) {
+            throw "You have too many pending todos. Finish some first!"
         }
     }
     catch(err) {
@@ -77,7 +82,9 @@ $(document).on("click", ".feather-trash-2", function() {
 });
 
 // Edit todo item
+
 $(document).on("click", ".feather-edit-2", function() {
+    if (editCount === 0) {  
     let currentVal = $(this).closest(`.task-item`).find(`span`).text();
     let editWrapper = `
     <div class="edit-container">
@@ -85,6 +92,9 @@ $(document).on("click", ".feather-edit-2", function() {
             <div class="form-row">
                 <div class="col-9">
                     <input type="text" id="editDescription" class="form-control" placeholder="${currentVal}" aria-label="edit-description" aria-describedby="edit-task" required>
+                    <div class="invalid-feedback">
+                        This item already exist in the list!
+                    </div>
                 </div>
                 <div class="col-3 text-right">
                     <button id="save" type="submit" class="btn btn-outline-secondary">Save</button> 
@@ -96,18 +106,34 @@ $(document).on("click", ".feather-edit-2", function() {
     `;
     $(this).closest(`.task-item`).append(editWrapper);
     $(this).closest(`.task-container`).css("display","none");
+    }
+    editCount = 1;
 });
+
 
 // save changes
 $(document).on("click", "#save", function() {
     event.preventDefault();
     let currentVal = $(this).closest(`.task-item`).find(`span`).text(); 
     let newVal = $("#editDescription").val();
+    
+    for (i=0; i < todo.tasks.length; i++) {
+        if (todo.tasks[i].description === newVal) {
+            $(`#editDescription`).addClass("is-invalid");
+            throw "This task already exist";        
+        }
+    }
+
+    if (newVal.length = 0) {
+        $(this).closest(`.task-item`).find("span").text(currentVal);
+    } else if (newVal != " " && newVal.length > 0) {
     let index = todo.tasks.findIndex(task => task.description === currentVal);
-    todo.tasks[index] = newVal;
-    $(this).closest('.task-container').find("span").text(newVal);
+    todo.tasks[index].description = newVal;
+    $(this).closest(`.task-item`).find("span").text(newVal);
+    }
     $(this).parents().find(`.task-container`).css("display","block");
     $(this).closest(`.edit-container`).remove();
+    editCount = 0;
 });
 
 
@@ -115,6 +141,7 @@ $(document).on("click", "#save", function() {
 $(document).on("click", "#cancel", function() {
     $(this).parents().find(`.task-container`).css("display","block");
     $(this).closest(`.edit-container`).remove();
+    editCount = 0;
 });
 
 
@@ -125,9 +152,11 @@ $(document).on("change", ":checkbox", function() {
 
   if (this.checked) {
     todo.tasks[index].isDone = true;
+    $(this).parent().find('.feather-edit-2').css("visibility", "hidden");
     updateTodoCounter();
   } else {
     todo.tasks[index].isDone = false;
+    $(this).parent().find('.feather-edit-2').css("visibility", "visible");
     updateTodoCounter();
   }
   $(this).parent().toggleClass("completed");
@@ -148,7 +177,11 @@ function updateTodoCounter() {
   numOfDoneTodo = todo.tasks.filter((x, i) => {return x.isDone;}).length;
   numOfPendingTodo = todo.tasks.length - numOfDoneTodo;
 
+  if (numOfPendingTodo === 1 || numOfPendingTodo === 0) {
+    $(`#numberTodo`).html(`${numOfPendingTodo} todo item`);
+  } else {
   $(`#numberTodo`).html(`${numOfPendingTodo} todo items`);
+  }
   $(`#clearComplete`).html(`Clear completed [${numOfDoneTodo}]`);
 
   // hide "Hide completed items" & "Clear completed" if no completed items.
@@ -164,12 +197,12 @@ function updateTodoCounter() {
 
 // hide complete
 $("#hideComplete").click(function() {
-    $(`#todo-body`).find(`.completed`).toggleClass(`d-none`);
-  
+    $(`#todo-body`).find(`.completed`).parent().toggleClass(`d-none`);
+
     if ($(`#todo-body`).find(`.completed`).hasClass(`d-none`)) {
-      $(`#hideComplete`).text(`Show completed items`);
+      $(`#hideComplete`).text(`Show completed`);
     } else {
-        $(`#hideComplete`).text(`Hide completed items`);
+        $(`#hideComplete`).text(`Hide completed`);
     }
   });
   
@@ -182,8 +215,7 @@ $("#clearComplete").click(function() {
           } else {
           i++;
       }
-      console.log(toRemoveArr);
       updateTodoCounter();
-      $(`#todo-body`).find(`.completed`).remove();
+      $(`#todo-body`).find(`.completed`).parent().remove();
   }
   });
