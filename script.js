@@ -1,8 +1,8 @@
 // declare global variable
 let numOfPendingTodo = 0;
 let numOfDoneTodo = 0;
-let editCount = 0;
 let maxNumOfPendingTodo = 20;
+let editCount = 0;
 
 // declare object todo
 const todo = {
@@ -12,9 +12,15 @@ const todo = {
     let task = {
       description: input,
       isDone: false,
-      listName: listName
+      list: listName
     };
     this.tasks.push(task);
+    
+    for (i = 0; i < todo.lists.length; i++ ) {
+        if(todo.lists[i].listName === listName) {
+            todo.lists[i].numOfTask += 1;
+        }
+    }
   },
   addList: function(input) {
     let list = {
@@ -26,12 +32,50 @@ const todo = {
   }
 };
 
-// add list
-$("#addList").click(function(event){
-    let listName = $("#listName").val();
-    $("#todoLists")
+// add new list
+$("#addList").click(function(event) {
+    event.preventDefault();
+    
+    let newListName = $("#todoListName").val();
+    let numOfTask = 0;
+
+    todo.addList(newListName);
+    let listWrapper = `
+    <div id="todo-${todo.lists.length}" class="list-item"><span class="list-name">${newListName}</span>
+    <span class="float-right num-task">${numOfTask}</span>
+    </div>
+    `
+    $("#todoLists").append(listWrapper);
+    switchTodoList(newListName);
+    $("#todoListName").val("");
 });
 
+// switch between different todos
+function switchTodoList(listName) {
+    $("#todo-body").html("");
+    $("#todo-title").html(listName);
+    let itemsInTodo ="";
+    for (i = 0; i < todo.tasks.length; i++ ) {
+        if(todo.tasks[i].list === listName) {
+            itemsInTodo += `
+            <div id="taskWrapper-${i}" class="custom-control custom-checkbox task-item">
+                <div class="task-container">
+                    <input type="checkbox" class="custom-control-input" id="task-${i}">
+                    <label class="custom-control-label" for="task-${i}"><span>${todo.tasks[i].description}</span></label>
+                    <div class="task-action"><i data-feather="edit-2"></i>
+                    <i data-feather="trash-2"></i></div>
+                </div>
+            </div>`
+        } 
+    }   
+    $("#todo-body").append(itemsInTodo);
+    feather.replace();
+}
+
+$(document).on("click", ".list-item", function() {
+    let listName = $(this).children().html();
+    switchTodoList(listName);
+});
 
 // add task
 $("#addTask").click(function(event) {
@@ -43,8 +87,10 @@ $("#addTask").click(function(event) {
   $("#taskDescription").removeClass("is-invalid");
 
   let isError = catchInvalidInput(taskDescription);
+  let listName = $("#todo-title").text();
+  
   if (taskDescription.length > 0 && isError === true) {
-    todo.addTask($("#taskDescription").val());
+    todo.addTask(taskDescription, listName);
     let taskWrapper = `
         <div id="taskWrapper-${todo.tasks.length}" class="custom-control custom-checkbox task-item">
             <div class="task-container">
@@ -53,7 +99,7 @@ $("#addTask").click(function(event) {
                 <div class="task-action"><i data-feather="edit-2"></i>
                 <i data-feather="trash-2"></i></div>
             </div>
-        </div>`;
+        </div>`
     $("#todo-body").append(taskWrapper);
     updateTodoCounter();
     feather.replace();
@@ -176,13 +222,24 @@ $(document).on("change", ":checkbox", function() {
 
 // update counter
 function updateTodoCounter() {
-
     // Display empty state
   if (todo.tasks.length > 0) {
     $("#todo-body").find("h3").addClass("d-none");
   } else {
     $("#todo-body").find("h3").removeClass("d-none");
   }
+
+  // update number of todo items for each list
+  
+    $('#todoLists > div').each(function() {
+    let listName = $(this).find(".list-name").text();
+    
+    for (i=0; i < todo.lists.length; i++) {
+        if (listName === todo.lists[i].listName) {
+            $(this).find('.num-task').text(todo.lists[i].numOfTask);
+        }    
+    }
+    });
 
   //Assign value to Number of pending todo & number of Completed todo
   numOfDoneTodo = todo.tasks.filter((x, i) => {return x.isDone;}).length;
@@ -206,6 +263,11 @@ function updateTodoCounter() {
   return numOfDoneTodo, numOfPendingTodo;
 }
 
+
+
+
+// click events
+
 // hide complete
 $("#hideComplete").click(function() {
     $("#todo-body").find(".completed").parent().toggleClass("d-none");
@@ -214,18 +276,21 @@ $("#hideComplete").click(function() {
     } else {
         $("#hideComplete").text("Hide completed");
     }
-  });
+});
   
 // clear complete
 $("#clearComplete").click(function() {
-      let i = 0;
-      while(i < todo.tasks.length) {
-          if(todo.tasks[i].isDone === true) {
-              todo.tasks.splice(i, 1);
-          } else {
-          i++;
-      }
-      updateTodoCounter();
-      $("#todo-body").find(".completed").parent().remove();
-  }
+    let i = 0;
+    while(i < todo.tasks.length) {
+        if(todo.tasks[i].isDone === true) {
+            todo.tasks.splice(i, 1);
+        } else {
+        i++;
+    }
+    updateTodoCounter();
+    $("#todo-body").find(".completed").parent().remove();
+    }
 });
+
+// add default todo list
+todo.addList("My Todo List");

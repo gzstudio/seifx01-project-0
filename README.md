@@ -21,17 +21,20 @@ This is a dead simple todo lists app. This todo app only allow user to have maxi
 [ ] optimised styling on mobile   
 
 **Advance functionalities**  
-[ ] multiple todo(s)  
+[x] multiple todo(s)  
+    [x] Get the number of task to display
+    [ ] Editing of todo title
 [ ] ability to archive todo(s)  
+
+[ ] ability to save to local storage / firebase  
+[ ] animation & styling   
+
+**Other ideas**  
 [ ] in-place edit  
 [ ] reordering of task  
 [ ] add sub-tasks  
 [ ] display % of subtask completed   
 [ ] automatically mark task as complete once all the sub-tasks are completed   
-[ ] ability to save to local storage / firebase  
-[ ] animation & styling   
-
-**Other ideas**  
 [ ] assign / remove tag(s)  
 [ ] filter by tag(s)  
 [ ] assign due date to task  
