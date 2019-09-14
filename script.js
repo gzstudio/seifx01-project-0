@@ -15,12 +15,6 @@ const todo = {
       list: listName
     };
     this.tasks.push(task);
-    
-    for (i = 0; i < todo.lists.length; i++ ) {
-        if(todo.lists[i].listName === listName) {
-            todo.lists[i].numOfTask += 1;
-        }
-    }
   },
   addList: function(input) {
     let list = {
@@ -54,23 +48,33 @@ $("#addList").click(function(event) {
 function switchTodoList(listName) {
     $("#todo-body").html("");
     $("#todo-title").html(listName);
+    let currentList = listName;
     let itemsInTodo ="";
-    for (i = 0; i < todo.tasks.length; i++ ) {
-        if(todo.tasks[i].list === listName) {
-            itemsInTodo += `
-            <div id="taskWrapper-${i}" class="custom-control custom-checkbox task-item">
-                <div class="task-container">
-                    <input type="checkbox" class="custom-control-input" id="task-${i}">
-                    <label class="custom-control-label" for="task-${i}"><span>${todo.tasks[i].description}</span></label>
-                    <div class="task-action"><i data-feather="edit-2"></i>
-                    <i data-feather="trash-2"></i></div>
-                </div>
-            </div>`
-        } 
-    }   
-    $("#todo-body").append(itemsInTodo);
-    feather.replace();
+    let numTask = $("#todoLists").find($(`.list-name:contains(${currentList})`)).next().text();
+    console.log(numTask);
+    if (numTask == 0) {
+    $("#todo-body").append(`<h3 class="text-secondary text-center">This list is currently empty. <br/>Add some items :)</h3>`);
+    } else {
+        for (i = 0; i < todo.tasks.length; i++ ) {
+            if(todo.tasks[i].list === listName) {
+                itemsInTodo += `
+                <div id="taskWrapper-${i}" class="custom-control custom-checkbox task-item">
+                    <div class="task-container">
+                        <input type="checkbox" class="custom-control-input" id="task-${i}">
+                        <label class="custom-control-label" for="task-${i}"><span>${todo.tasks[i].description}</span></label>
+                        <div class="task-action"><i data-feather="edit-2"></i>
+                        <i data-feather="trash-2"></i></div>
+                    </div>
+                </div>`
+            }
+        }   
+        $("#todo-body").append(itemsInTodo);
+        feather.replace();
+        updateTodoCounter();
+    }
 }
+
+
 
 $(document).on("click", ".list-item", function() {
     let listName = $(this).children().html();
@@ -222,28 +226,40 @@ $(document).on("change", ":checkbox", function() {
 
 // update counter
 function updateTodoCounter() {
-    // Display empty state
-  if (todo.tasks.length > 0) {
-    $("#todo-body").find("h3").addClass("d-none");
-  } else {
-    $("#todo-body").find("h3").removeClass("d-none");
-  }
-
-  // update number of todo items for each list
-  
-    $('#todoLists > div').each(function() {
-    let listName = $(this).find(".list-name").text();
     
-    for (i=0; i < todo.lists.length; i++) {
-        if (listName === todo.lists[i].listName) {
-            $(this).find('.num-task').text(todo.lists[i].numOfTask);
-        }    
-    }
+    // update number of todo items for each list
+    $('#todoLists > div').each(function() {
+        let listName = $(this).find(".list-name").text();
+
+        for (i=0; i < todo.lists.length; i++) {
+            if (listName === todo.lists[i].listName) {
+                $(this).find('.num-task').text(todo.lists[i].numOfTask);
+            }    
+        }
     });
 
-  //Assign value to Number of pending todo & number of Completed todo
-  numOfDoneTodo = todo.tasks.filter((x, i) => {return x.isDone;}).length;
-  numOfPendingTodo = todo.tasks.length - numOfDoneTodo;
+    //Assign value to Number of pending todo & number of Completed todo
+    let currentList = $("#todo-title").text();
+    let taskInCurrentList = todo.tasks.filter(task => task.list === currentList); 
+    let doneTodoInCurrentList = taskInCurrentList.filter(task => task.isDone === true);
+    
+    numOfDoneTodo = doneTodoInCurrentList.length;
+    numOfPendingTodo = taskInCurrentList.length - numOfDoneTodo;
+
+    for (i=0; i < todo.lists.length; i++) {
+        if (todo.lists[i].listName === currentList) {
+            todo.lists[i].numOfTask = numOfPendingTodo;
+        }
+    }
+    $("#todoLists").find($(`.list-name:contains(${currentList})`)).next().text(numOfPendingTodo);
+
+  // Display empty state
+    if (taskInCurrentList.length > 0) {
+        $("#todo-body").find("h3").addClass("d-none");
+    } else {
+        $("#todo-body").find("h3").removeClass("d-none");
+    }
+
 
   if (numOfPendingTodo === 1 || numOfPendingTodo === 0) {
     $("#numberTodo").html(`${numOfPendingTodo} todo item`);
