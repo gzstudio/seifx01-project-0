@@ -3,6 +3,17 @@ body{
     font-family: "Menlo",Monaco,Consolas,"Liberation Mono","Courier New",monospace;
 }
 
+.sidebar {
+    min-height: 100%;
+    position: absolute;
+}
+.sidebar-sticky {
+    color: #fff;
+    margin-top:20px;
+}
+.sidebar-sticky div{
+    padding: 4px 0;
+}
 .text-secondary {
     color: #ccc!important;
 }

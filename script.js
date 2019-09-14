@@ -1,12 +1,13 @@
+// declare global variable
 let numOfPendingTodo = 0;
 let numOfDoneTodo = 0;
 let editCount = 0;
+let maxNumOfPendingTodo = 20;
 
 // declare object todo
 const todo = {
   tasks: [],
   lists: [],
-  completedTasks: [],
   addTask: function(input,listName) {
     let task = {
       description: input,
@@ -14,15 +15,28 @@ const todo = {
       listName: listName
     };
     this.tasks.push(task);
+  },
+  addList: function(input) {
+    let list = {
+        listName: input,
+        numOfTask: 0,
+        isArchive: false
+    };
+    this.lists.push(list);
   }
 };
 
 // add list
+$("#addList").click(function(event){
+    let listName = $("#listName").val();
+    $("#todoLists")
+});
 
 
 // add task
-$(`#addTask`).click(function(event) {
+$("#addTask").click(function(event) {
   event.preventDefault();
+
   let taskDescription = $("#taskDescription").val();
 
   $(".invalid-feedback").css("visibility", "hidden");
@@ -50,7 +64,7 @@ $(`#addTask`).click(function(event) {
 // catch invalid input
 function catchInvalidInput(taskDescription) {
     try {
-        if (taskDescription.length === 0 || taskDescription === ` `) {
+        if (taskDescription.length === 0 || taskDescription === " ") {
             throw "Can't add an empty item..duhhh";
         }
         for (i=0; i < todo.tasks.length; i++) {
@@ -58,15 +72,15 @@ function catchInvalidInput(taskDescription) {
                 throw "This task already exist";        
             }
         }
-        if (numOfPendingTodo > 20) {
+        if (numOfPendingTodo > maxNumOfPendingTodo) {
             throw "You have too many pending todos. Finish some first!"
         }
     }
     catch(err) {
         console.log(err);
-        $(`.invalid-feedback`).html(err);
-        $(`#taskDescription`).addClass("is-invalid");
-        $(`.invalid-feedback`).css("visibility", "visible");
+        $(".invalid-feedback").html(err);
+        $("#taskDescription").addClass("is-invalid");
+        $(".invalid-feedback").css("visibility", "visible");
         return false;
     }
     return true;
@@ -74,19 +88,18 @@ function catchInvalidInput(taskDescription) {
 
 // click to delete
 $(document).on("click", ".feather-trash-2", function() {
-  let val = $(this).closest(`.task-item`).find(`span`).text();
+  let val = $(this).closest(".task-item").find("span").text();
   let index = todo.tasks.findIndex(task => task.description === val);
 
   todo.tasks.splice(index, 1);
   updateTodoCounter();
-  $(this).closest(`.task-item`).remove();
+  $(this).closest(".task-item").remove();
 });
 
 // Edit todo item
-
 $(document).on("click", ".feather-edit-2", function() {
     if (editCount === 0) {  
-    let currentVal = $(this).closest(`.task-item`).find(`span`).text();
+    let currentVal = $(this).closest(".task-item").find("span").text();
     let editWrapper = `
     <div class="edit-container">
         <form>
@@ -105,8 +118,8 @@ $(document).on("click", ".feather-edit-2", function() {
         </form>
     </div>
     `;
-    $(this).closest(`.task-item`).append(editWrapper);
-    $(this).closest(`.task-container`).css("display","none");
+    $(this).closest(".task-item").append(editWrapper);
+    $(this).closest(".task-container").css("display","none");
     }
     editCount = 1;
 });
@@ -115,49 +128,47 @@ $(document).on("click", ".feather-edit-2", function() {
 // save changes
 $(document).on("click", "#save", function() {
     event.preventDefault();
-    let currentVal = $(this).closest(`.task-item`).find(`span`).text(); 
+    let currentVal = $(this).closest(".task-item").find("span").text(); 
     let newVal = $("#editDescription").val();
     
     for (i=0; i < todo.tasks.length; i++) {
         if (todo.tasks[i].description === newVal) {
-            $(`#editDescription`).addClass("is-invalid");
+            $("#editDescription").addClass("is-invalid");
             throw "This task already exist";        
         }
     }
 
     if (newVal.length = 0) {
-        $(this).closest(`.task-item`).find("span").text(currentVal);
+        $(this).closest(".task-item").find("span").text(currentVal);
     } else if (newVal != " " && newVal.length > 0) {
     let index = todo.tasks.findIndex(task => task.description === currentVal);
     todo.tasks[index].description = newVal;
-    $(this).closest(`.task-item`).find("span").text(newVal);
+    $(this).closest(".task-item").find("span").text(newVal);
     }
-    $(this).parents().find(`.task-container`).css("display","block");
-    $(this).closest(`.edit-container`).remove();
+    $(this).parents().find(".task-container").css("display","block");
+    $(this).closest(".edit-container").remove();
     editCount = 0;
 });
-
 
 // cancel changes
 $(document).on("click", "#cancel", function() {
-    $(this).parents().find(`.task-container`).css("display","block");
-    $(this).closest(`.edit-container`).remove();
+    $(this).parents().find(".task-container").css("display","block");
+    $(this).closest(".edit-container").remove();
     editCount = 0;
 });
 
-
 // check / uncheck complete
 $(document).on("change", ":checkbox", function() {
-  let val = $(this).parent().find(`span`).text();
+  let val = $(this).parent().find("span").text();
   let index = todo.tasks.findIndex(task => task.description === val);
 
   if (this.checked) {
     todo.tasks[index].isDone = true;
-    $(this).parent().find('.feather-edit-2').css("visibility", "hidden");
+    $(this).parent().find(".feather-edit-2").css("visibility", "hidden");
     updateTodoCounter();
   } else {
     todo.tasks[index].isDone = false;
-    $(this).parent().find('.feather-edit-2').css("visibility", "visible");
+    $(this).parent().find(".feather-edit-2").css("visibility", "visible");
     updateTodoCounter();
   }
   $(this).parent().toggleClass("completed");
@@ -168,22 +179,21 @@ function updateTodoCounter() {
 
     // Display empty state
   if (todo.tasks.length > 0) {
-    $(`#todo-body`).find(`h3`).addClass(`d-none`);
+    $("#todo-body").find("h3").addClass("d-none");
   } else {
-    $(`#todo-body`).find(`h3`).removeClass(`d-none`);
+    $("#todo-body").find("h3").removeClass("d-none");
   }
 
   //Assign value to Number of pending todo & number of Completed todo
-
   numOfDoneTodo = todo.tasks.filter((x, i) => {return x.isDone;}).length;
   numOfPendingTodo = todo.tasks.length - numOfDoneTodo;
 
   if (numOfPendingTodo === 1 || numOfPendingTodo === 0) {
-    $(`#numberTodo`).html(`${numOfPendingTodo} todo item`);
+    $("#numberTodo").html(`${numOfPendingTodo} todo item`);
   } else {
-  $(`#numberTodo`).html(`${numOfPendingTodo} todo items`);
+  $("#numberTodo").html(`${numOfPendingTodo} todo items`);
   }
-  $(`#clearComplete`).html(`Clear completed [${numOfDoneTodo}]`);
+  $("#clearComplete").html(`Clear completed [${numOfDoneTodo}]`);
 
   // hide "Hide completed items" & "Clear completed" if no completed items.
   if(numOfDoneTodo > 0) {
@@ -198,11 +208,11 @@ function updateTodoCounter() {
 
 // hide complete
 $("#hideComplete").click(function() {
-    $(`#todo-body`).find(`.completed`).parent().toggleClass(`d-none`);
-    if ($(`#todo-body`).find(`.completed`).parent().hasClass(`d-none`)) {
-        $(`#hideComplete`).text(`Show completed`);
+    $("#todo-body").find(".completed").parent().toggleClass("d-none");
+    if ($("#todo-body").find(".completed").parent().hasClass("d-none")) {
+        $("#hideComplete").text("Show completed");
     } else {
-        $(`#hideComplete`).text(`Hide completed`);
+        $("#hideComplete").text("Hide completed");
     }
   });
   
@@ -216,6 +226,6 @@ $("#clearComplete").click(function() {
           i++;
       }
       updateTodoCounter();
-      $(`#todo-body`).find(`.completed`).parent().remove();
+      $("#todo-body").find(".completed").parent().remove();
   }
-  });
+});
