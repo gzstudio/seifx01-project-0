@@ -5,7 +5,7 @@ let maxNumOfPendingTodo = 20;
 let editCount = 0;
 
 // declare object todo
-const todo = {
+let todo = {
   tasks: [],
   lists: [],
   addTask: function(input,listName) {
@@ -15,6 +15,7 @@ const todo = {
       list: listName
     };
     this.tasks.push(task);
+    db.collection("tasks").add({description: input, isDone: false, list: listName});
   },
   addList: function(input) {
     let list = {
@@ -23,8 +24,43 @@ const todo = {
         isArchive: false
     };
     this.lists.push(list);
+    db.collection("lists").add({listname: input, numOfTask: 0, isArchive: false});
   }
 };
+
+// Initialize Cloud Firestore through Firebase
+// TODO: add the firebase initialisation logic here:
+var firebaseConfig = {
+    apiKey: "AIzaSyCoe5tFHO4R-OHm2Ebh41EAEeu4fgHaTBg",
+    authDomain: "todoapp-96721.firebaseapp.com",
+    databaseURL: "https://todoapp-96721.firebaseio.com",
+    projectId: "todoapp-96721",
+    storageBucket: "todoapp-96721.appspot.com",
+    messagingSenderId: "401809533763",
+    appId: "1:401809533763:web:8b50e64a67638ceefaddf6"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+// Create an instance of our DB
+var db = firebase.firestore();
+
+db.collection("tasks").onSnapshot(function(snapshot) {
+    tasks = {}
+    snapshot.forEach(function(doc) {
+        tasks[doc.id] = doc.data();
+    });
+    console.log(tasks);
+});
+
+db.collection("lists").onSnapshot(function(snapshot) {
+    lists = {}
+    snapshot.forEach(function(doc) {
+        lists[doc.id] = doc.data();
+    });
+    console.log(lists);
+});
+
 
 // add new list
 $("#addList").click(function(event) {
@@ -310,3 +346,4 @@ $("#clearComplete").click(function() {
 
 // add default todo list
 todo.addList("My Todo List");
+
