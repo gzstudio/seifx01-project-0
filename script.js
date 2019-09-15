@@ -51,6 +51,7 @@ db.collection("tasks").onSnapshot(function(snapshot) {
         tasks[doc.id] = doc.data();
     });
     console.log(tasks);
+    updateTodoCounter()
 });
 
 db.collection("lists").onSnapshot(function(snapshot) {
@@ -59,17 +60,20 @@ db.collection("lists").onSnapshot(function(snapshot) {
         lists[doc.id] = doc.data();
     });
     console.log(lists);
+    
 });
 
 
 
 
-function displayList() {
-    
+// add new list
+$("#addList").click(function(event) {
+    event.preventDefault();
     let newListName = $("#todoListName").val();
     let numOfTask = 0;
 
     todo.addList(newListName);
+
     let listWrapper = `
     <div id="todo-${todo.lists.length}" class="list-item"><span class="list-name">${newListName}</span>
     <span class="float-right num-task">${numOfTask}</span>
@@ -78,12 +82,6 @@ function displayList() {
     $("#todoLists").append(listWrapper);
     switchTodoList(newListName);
     $("#todoListName").val("");
-};
-
-// add new list
-$("#addList").click(function(event) {
-    event.preventDefault();
-    displayList();
 });
 
 // switch between different todos

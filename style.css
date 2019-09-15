@@ -58,7 +58,7 @@ body{
 }
 
 #todo-body h3{
-    padding: 16%;
+    padding-top: 12vh;
 }
 
 .invalid-feedback{
