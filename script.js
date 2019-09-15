@@ -62,9 +62,9 @@ db.collection("lists").onSnapshot(function(snapshot) {
 });
 
 
-// add new list
-$("#addList").click(function(event) {
-    event.preventDefault();
+
+
+function displayList() {
     
     let newListName = $("#todoListName").val();
     let numOfTask = 0;
@@ -78,6 +78,12 @@ $("#addList").click(function(event) {
     $("#todoLists").append(listWrapper);
     switchTodoList(newListName);
     $("#todoListName").val("");
+};
+
+// add new list
+$("#addList").click(function(event) {
+    event.preventDefault();
+    displayList();
 });
 
 // switch between different todos
@@ -315,19 +321,18 @@ function updateTodoCounter() {
   return numOfDoneTodo, numOfPendingTodo;
 }
 
-
-
-
-// click events
-
-// hide complete
-$("#hideComplete").click(function() {
+function toggleCompleteTodo() {
     $("#todo-body").find(".completed").parent().toggleClass("d-none");
     if ($("#todo-body").find(".completed").parent().hasClass("d-none")) {
         $("#hideComplete").text("Show completed");
     } else {
         $("#hideComplete").text("Hide completed");
     }
+};
+
+// toggle show hide complete
+$("#hideComplete").click(function() {
+    toggleCompleteTodo()
 });
   
 // clear complete
