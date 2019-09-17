@@ -24,12 +24,11 @@ This is a dead simple todo lists app. This todo app only allow user to have maxi
 [x] multiple todo(s)  
     [x] Get the number of task to display
     [ ] Editing of todo title
-[ ] ability to archive todo(s)  
-
 [ ] ability to save to local storage / firebase  
 [ ] animation & styling   
 
 **Other ideas**  
+[ ] ability to archive todo(s)  
 [ ] in-place edit  
 [ ] reordering of task  
 [ ] add sub-tasks  

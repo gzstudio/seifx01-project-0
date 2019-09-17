@@ -10,21 +10,25 @@ let todo = {
   lists: [],
   addTask: function(input,listName) {
     let task = {
+        id: 'task_' + Date.now(),
       description: input,
       isDone: false,
       list: listName
     };
     this.tasks.push(task);
-    db.collection("tasks").add({description: input, isDone: false, list: listName});
+    db.collection("tasks").add({id:'task_' + Date.now(),description: input, isDone: false, list: listName});
+    return task;
   },
   addList: function(input) {
     let list = {
+        id: 'list_' + Date.now(),
         listName: input,
         numOfTask: 0,
         isArchive: false
     };
     this.lists.push(list);
-    db.collection("lists").add({listname: input, numOfTask: 0, isArchive: false});
+    db.collection("lists").add({id:'list_' + Date.now(),listname: input, numOfTask: 0, isArchive: false});
+    return list;
   }
 };
 
@@ -45,17 +49,23 @@ var firebaseConfig = {
 // Create an instance of our DB
 var db = firebase.firestore();
 
-db.collection("tasks").onSnapshot(function(snapshot) {
-    tasks = {}
-    snapshot.forEach(function(doc) {
-        tasks[doc.id] = doc.data();
-    });
-    console.log(tasks);
-    updateTodoCounter()
-});
+db.collection("tasks").get().then((snapshot) => {
+    snapshot.docs.forEach(doc => {
+        renderTask(doc.data());
+    })
+})
+
+// db.collection("tasks").onSnapshot(function(snapshot) {
+//     tasks = {}
+//     snapshot.forEach(function(doc) {
+//         tasks[doc.id] = doc.data();
+//     });
+//     console.log(tasks);
+    
+// });
 
 db.collection("lists").onSnapshot(function(snapshot) {
-    lists = {}
+    let lists = {}
     snapshot.forEach(function(doc) {
         lists[doc.id] = doc.data();
     });
@@ -63,23 +73,21 @@ db.collection("lists").onSnapshot(function(snapshot) {
     
 });
 
-
+function createListDiv(list) {
+    let listWrapper = ` 
+    <div id="${list.id}" class="list-item"><span class="list-name">${list.listName}</span>
+    <span class="float-right num-task">${list.numOfTask}</span>
+    </div>`
+    $("#todoLists").append(listWrapper);
+};
 
 
 // add new list
 $("#addList").click(function(event) {
     event.preventDefault();
     let newListName = $("#todoListName").val();
-    let numOfTask = 0;
-
-    todo.addList(newListName);
-
-    let listWrapper = `
-    <div id="todo-${todo.lists.length}" class="list-item"><span class="list-name">${newListName}</span>
-    <span class="float-right num-task">${numOfTask}</span>
-    </div>
-    `
-    $("#todoLists").append(listWrapper);
+    let list = todo.addList(newListName);
+    createListDiv(list);
     switchTodoList(newListName);
     $("#todoListName").val("");
 });
@@ -98,10 +106,10 @@ function switchTodoList(listName) {
         for (i = 0; i < todo.tasks.length; i++ ) {
             if(todo.tasks[i].list === listName) {
                 itemsInTodo += `
-                <div id="taskWrapper-${i}" class="custom-control custom-checkbox task-item">
+                <div id="${todo.tasks[i].id}" class="custom-control custom-checkbox task-item">
                     <div class="task-container">
-                        <input type="checkbox" class="custom-control-input" id="task-${i}">
-                        <label class="custom-control-label" for="task-${i}"><span>${todo.tasks[i].description}</span></label>
+                        <input type="checkbox" class="custom-control-input" id="item_${i}">
+                        <label class="custom-control-label" for="item_${i}"><span>${todo.tasks[i].description}</span></label>
                         <div class="task-action"><i data-feather="edit-2"></i>
                         <i data-feather="trash-2"></i></div>
                     </div>
@@ -114,19 +122,29 @@ function switchTodoList(listName) {
     }
 }
 
-
-
 $(document).on("click", ".list-item", function() {
     let listName = $(this).children().html();
     switchTodoList(listName);
 });
+
+function createTaskDiv(task) {
+    let taskWrapper = `
+    <div id="${task.id}" class="custom-control custom-checkbox task-item">
+        <div class="task-container">
+            <input type="checkbox" class="custom-control-input" id="${todo.tasks.length}">
+            <label class="custom-control-label" for="${todo.tasks.length}"><span>${task.description}</span></label>
+            <div class="task-action"><i data-feather="edit-2"></i>
+            <i data-feather="trash-2"></i></div>
+        </div>
+    </div>`
+    $("#todo-body").append(taskWrapper);
+}
 
 // add task
 $("#addTask").click(function(event) {
   event.preventDefault();
 
   let taskDescription = $("#taskDescription").val();
-
   $(".invalid-feedback").css("visibility", "hidden");
   $("#taskDescription").removeClass("is-invalid");
 
@@ -134,17 +152,9 @@ $("#addTask").click(function(event) {
   let listName = $("#todo-title").text();
   
   if (taskDescription.length > 0 && isError === true) {
-    todo.addTask(taskDescription, listName);
-    let taskWrapper = `
-        <div id="taskWrapper-${todo.tasks.length}" class="custom-control custom-checkbox task-item">
-            <div class="task-container">
-                <input type="checkbox" class="custom-control-input" id="task-${todo.tasks.length}">
-                <label class="custom-control-label" for="task-${todo.tasks.length}"><span>${taskDescription}</span></label>
-                <div class="task-action"><i data-feather="edit-2"></i>
-                <i data-feather="trash-2"></i></div>
-            </div>
-        </div>`
-    $("#todo-body").append(taskWrapper);
+  
+    let task = todo.addTask(taskDescription, listName);
+    createTaskDiv(task);
     updateTodoCounter();
     feather.replace();
   }
@@ -156,11 +166,6 @@ function catchInvalidInput(taskDescription) {
     try {
         if (taskDescription.length === 0 || taskDescription === " ") {
             throw "Can't add an empty item..duhhh";
-        }
-        for (i=0; i < todo.tasks.length; i++) {
-            if (todo.tasks[i].description === taskDescription) {
-                throw "This task already exist";        
-            }
         }
         if (numOfPendingTodo > maxNumOfPendingTodo) {
             throw "You have too many pending todos. Finish some first!"
@@ -178,8 +183,8 @@ function catchInvalidInput(taskDescription) {
 
 // click to delete
 $(document).on("click", ".feather-trash-2", function() {
-  let val = $(this).closest(".task-item").find("span").text();
-  let index = todo.tasks.findIndex(task => task.description === val);
+  let taskId = $(this).closest(".task-item").attr('id');
+  let index = todo.tasks.findIndex(task => task.id === taskId);
 
   todo.tasks.splice(index, 1);
   updateTodoCounter();
@@ -249,8 +254,8 @@ $(document).on("click", "#cancel", function() {
 
 // check / uncheck complete
 $(document).on("change", ":checkbox", function() {
-  let val = $(this).parent().find("span").text();
-  let index = todo.tasks.findIndex(task => task.description === val);
+    let taskId = $(this).closest(".task-item").attr('id');
+    let index = todo.tasks.findIndex(task => task.id === taskId);
 
   if (this.checked) {
     todo.tasks[index].isDone = true;
