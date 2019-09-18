@@ -1,7 +1,9 @@
+///////////  -----  Declare global stuffs  -----  ///////////
+
 // declare global variable
 let numOfPendingTodo = 0;
 let numOfDoneTodo = 0;
-let maxNumOfPendingTodo = 20;
+let maxNumOfPendingTodo = 100;
 let editCount = 0;
 
 // declare object todo
@@ -32,6 +34,8 @@ let todo = {
   }
 };
 
+///////////  -----  Firebase  -----  ///////////
+
 // Initialize Cloud Firestore through Firebase
 // TODO: add the firebase initialisation logic here:
 var firebaseConfig = {
@@ -49,29 +53,55 @@ var firebaseConfig = {
 // Create an instance of our DB
 var db = firebase.firestore();
 
+// Render tasks from firestore
+function renderTask(doc){
+    let uniqueID = Date.now();
+    let taskWrapper = `
+    <div data-id="${doc.id}" id="${doc.data().id}" class="custom-control custom-checkbox task-item">
+        <div class="task-container">
+            <input type="checkbox" class="custom-control-input" id="${uniqueID}">
+            <label class="custom-control-label" for="${uniqueID}"><span>${doc.data().description}</span></label>
+            <div class="task-action"><i data-feather="edit-2"></i>
+            <i data-feather="trash-2"></i></div>
+        </div>
+    </div>`
+    $("#todo-body").append(taskWrapper);
+    feather.replace();
+}
+
+function renderList(doc){
+    let listWrapper = ` 
+    <div data-id="${doc.id}" id="${doc.data().id}" class="list-item"><span class="list-name">${doc.data().listname}</span>
+    <span class="float-right num-task">${doc.data().numOfTask}</span>
+    </div>`
+    $("#todoLists").append(listWrapper);
+}
+
 db.collection("tasks").get().then((snapshot) => {
     snapshot.docs.forEach(doc => {
-        renderTask(doc.data());
+        todo.tasks.push(doc.data());
     })
 })
 
-// db.collection("tasks").onSnapshot(function(snapshot) {
-//     tasks = {}
-//     snapshot.forEach(function(doc) {
-//         tasks[doc.id] = doc.data();
-//     });
-//     console.log(tasks);
-    
-// });
+db.collection("lists").get().then((snapshot) => {
+    snapshot.docs.forEach(doc => {
+        todo.lists.push(doc.data());
+    })
+})
 
-db.collection("lists").onSnapshot(function(snapshot) {
-    let lists = {}
-    snapshot.forEach(function(doc) {
-        lists[doc.id] = doc.data();
-    });
-    console.log(lists);
-    
-});
+db.collection("lists").orderBy("id").onSnapshot(snapshot => {
+    let changes = snapshot.docChanges();
+    changes.forEach(change => {
+        if(change.type == 'added') {
+            renderList(change.doc);
+            updateTodoCounter();
+        }
+    })
+})
+
+
+///////////  -----  List / Task creator  -----  ///////////
+
 
 function createListDiv(list) {
     let listWrapper = ` 
@@ -81,13 +111,27 @@ function createListDiv(list) {
     $("#todoLists").append(listWrapper);
 };
 
+function createTaskDiv(task) {
+    let uniqueID = Date.now();
+    let taskWrapper = `
+    <div id="${task.id}" class="custom-control custom-checkbox task-item">
+        <div class="task-container">
+            <input type="checkbox" class="custom-control-input" id="${uniqueID}">
+            <label class="custom-control-label" for="${uniqueID}"><span>${task.description}</span></label>
+            <div class="task-action"><i data-feather="edit-2"></i>
+            <i data-feather="trash-2"></i></div>
+        </div>
+    </div>`
+    $("#todo-body").append(taskWrapper);
+}
+
+///////////  -----  Click Functions  -----  ///////////
 
 // add new list
 $("#addList").click(function(event) {
     event.preventDefault();
     let newListName = $("#todoListName").val();
-    let list = todo.addList(newListName);
-    createListDiv(list);
+    todo.addList(newListName);
     switchTodoList(newListName);
     $("#todoListName").val("");
 });
@@ -96,49 +140,48 @@ $("#addList").click(function(event) {
 function switchTodoList(listName) {
     $("#todo-body").html("");
     $("#todo-title").html(listName);
+
     let currentList = listName;
     let itemsInTodo ="";
     let numTask = $("#todoLists").find($(`.list-name:contains(${currentList})`)).next().text();
-    console.log(numTask);
-    if (numTask == 0) {
-    $("#todo-body").append(`<h3 class="text-secondary text-center">This list is currently empty. <br/>Add some items :)</h3>`);
-    } else {
-        for (i = 0; i < todo.tasks.length; i++ ) {
-            if(todo.tasks[i].list === listName) {
-                itemsInTodo += `
-                <div id="${todo.tasks[i].id}" class="custom-control custom-checkbox task-item">
-                    <div class="task-container">
-                        <input type="checkbox" class="custom-control-input" id="item_${i}">
-                        <label class="custom-control-label" for="item_${i}"><span>${todo.tasks[i].description}</span></label>
-                        <div class="task-action"><i data-feather="edit-2"></i>
-                        <i data-feather="trash-2"></i></div>
-                    </div>
-                </div>`
-            }
-        }   
-        $("#todo-body").append(itemsInTodo);
-        feather.replace();
-        updateTodoCounter();
-    }
+
+    db.collection("tasks").where("list", '==', listName).onSnapshot(snapshot => {
+        let changes = snapshot.docChanges();     
+        changes.forEach(change => {
+            if(change.type == 'added') {
+                renderTask(change.doc);
+                updateTodoCounter();
+            } 
+        })
+    })
+
+    // if (numTask == 0) {
+    // $("#todo-body").append(`<h3 class="text-secondary text-center">This list is currently empty. <br/>Add some items :)</h3>`);
+    // } else {
+        
+        // for (i = 0; i < todo.tasks.length; i++ ) {
+        //     if(todo.tasks[i].list === listName) {
+        //         itemsInTodo += `
+        //         <div id="${todo.tasks[i].id}" class="custom-control custom-checkbox task-item">
+        //             <div class="task-container">
+        //                 <input type="checkbox" class="custom-control-input" id="item_${i}">
+        //                 <label class="custom-control-label" for="item_${i}"><span>${todo.tasks[i].description}</span></label>
+        //                 <div class="task-action"><i data-feather="edit-2"></i>
+        //                 <i data-feather="trash-2"></i></div>
+        //             </div>
+        //         </div>`
+        //     }
+        // }   
+        // $("#todo-body").append(itemsInTodo);
+        // feather.replace();
+        // updateTodoCounter();
+    // }
 }
 
 $(document).on("click", ".list-item", function() {
     let listName = $(this).children().html();
     switchTodoList(listName);
 });
-
-function createTaskDiv(task) {
-    let taskWrapper = `
-    <div id="${task.id}" class="custom-control custom-checkbox task-item">
-        <div class="task-container">
-            <input type="checkbox" class="custom-control-input" id="${todo.tasks.length}">
-            <label class="custom-control-label" for="${todo.tasks.length}"><span>${task.description}</span></label>
-            <div class="task-action"><i data-feather="edit-2"></i>
-            <i data-feather="trash-2"></i></div>
-        </div>
-    </div>`
-    $("#todo-body").append(taskWrapper);
-}
 
 // add task
 $("#addTask").click(function(event) {
@@ -153,13 +196,16 @@ $("#addTask").click(function(event) {
   
   if (taskDescription.length > 0 && isError === true) {
   
-    let task = todo.addTask(taskDescription, listName);
-    createTaskDiv(task);
+    todo.addTask(taskDescription, listName);
     updateTodoCounter();
     feather.replace();
   }
   $("#taskDescription").val("");
 });
+
+
+///////////  -----  Validation  -----  ///////////
+
 
 // catch invalid input
 function catchInvalidInput(taskDescription) {
@@ -172,7 +218,6 @@ function catchInvalidInput(taskDescription) {
         }
     }
     catch(err) {
-        console.log(err);
         $(".invalid-feedback").html(err);
         $("#taskDescription").addClass("is-invalid");
         $(".invalid-feedback").css("visibility", "visible");
@@ -181,11 +226,13 @@ function catchInvalidInput(taskDescription) {
     return true;
 }
 
+
 // click to delete
 $(document).on("click", ".feather-trash-2", function() {
   let taskId = $(this).closest(".task-item").attr('id');
+  let id = $(this).closest(".task-item").attr('data-id');
   let index = todo.tasks.findIndex(task => task.id === taskId);
-
+  db.collection('tasks').doc(id).delete();
   todo.tasks.splice(index, 1);
   updateTodoCounter();
   $(this).closest(".task-item").remove();
@@ -225,6 +272,7 @@ $(document).on("click", "#save", function() {
     event.preventDefault();
     let currentVal = $(this).closest(".task-item").find("span").text(); 
     let newVal = $("#editDescription").val();
+    let id = $(this).closest(".task-item").attr('data-id');
     
     for (i=0; i < todo.tasks.length; i++) {
         if (todo.tasks[i].description === newVal) {
@@ -232,13 +280,13 @@ $(document).on("click", "#save", function() {
             throw "This task already exist";        
         }
     }
-
     if (newVal.length = 0) {
         $(this).closest(".task-item").find("span").text(currentVal);
     } else if (newVal != " " && newVal.length > 0) {
     let index = todo.tasks.findIndex(task => task.description === currentVal);
     todo.tasks[index].description = newVal;
     $(this).closest(".task-item").find("span").text(newVal);
+    db.collection("tasks").doc(id).update({description: newVal });
     }
     $(this).parents().find(".task-container").css("display","block");
     $(this).closest(".edit-container").remove();
@@ -255,14 +303,17 @@ $(document).on("click", "#cancel", function() {
 // check / uncheck complete
 $(document).on("change", ":checkbox", function() {
     let taskId = $(this).closest(".task-item").attr('id');
+    let id = $(this).closest(".task-item").attr('data-id');
     let index = todo.tasks.findIndex(task => task.id === taskId);
 
   if (this.checked) {
     todo.tasks[index].isDone = true;
+    db.collection("tasks").doc(id).update({isDone: true });
     $(this).parent().find(".feather-edit-2").css("visibility", "hidden");
     updateTodoCounter();
   } else {
     todo.tasks[index].isDone = false;
+    db.collection("tasks").doc(id).update({isDone: false });
     $(this).parent().find(".feather-edit-2").css("visibility", "visible");
     updateTodoCounter();
   }
@@ -305,7 +356,6 @@ function updateTodoCounter() {
         $("#todo-body").find("h3").removeClass("d-none");
     }
 
-
   if (numOfPendingTodo === 1 || numOfPendingTodo === 0) {
     $("#numberTodo").html(`${numOfPendingTodo} todo item`);
   } else {
@@ -333,6 +383,7 @@ function toggleCompleteTodo() {
     }
 };
 
+
 // toggle show hide complete
 $("#hideComplete").click(function() {
     toggleCompleteTodo()
@@ -352,6 +403,6 @@ $("#clearComplete").click(function() {
     }
 });
 
-// add default todo list
-todo.addList("My Todo List");
+switchTodoList("My Todo List");
+
 
