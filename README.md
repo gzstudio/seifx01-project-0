@@ -24,7 +24,7 @@ This is a dead simple todo lists app. This todo app only allow user to have maxi
 [x] multiple todo(s)  
     [x] Get the number of task to display
     [ ] Editing of todo title
-[ ] ability to save to local storage / firebase  
+[x] ability to save to local storage / firebase  
 [ ] animation & styling   
 
 **Other ideas**  
