@@ -46,7 +46,6 @@ This is a dead simple todo lists app. This todo app only allow user to have maxi
 - clear completed function isn't saved to firebase
 - task count does not display when application load  
 - sometimes task count got messed up
-- empty state doesn't display properly  
 - if you hide complete and refresh, application broke  
 - sometimes checkbox ended up having the same ID
 

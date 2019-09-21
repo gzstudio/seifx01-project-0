@@ -9,7 +9,7 @@ let editCount = 0;
 // declare object todo
 let todo = {
     tasks: [],
-    lists: [],
+    lists: [{id:'list_0', listname: 'My Todo List', numOfTask:0, isArchive:false}],
     addTask: function(input,listName) {
         let task = {
             id: 'task_' + Date.now(),
@@ -295,7 +295,7 @@ $(document).on("change", ":checkbox", function() {
 
 // update counter
 function updateTodoCounter() {
-    
+        console.log(todo.lists.length)
      //Assign value to Number of pending todo & number of Completed todo
      let currentList = $("#todo-title").text();
      let taskInCurrentList = todo.tasks.filter(task => task.list === currentList); 
