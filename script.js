@@ -9,7 +9,7 @@ let editCount = 0;
 // declare object todo
 let todo = {
     tasks: [],
-    lists: [{id:'list_0', listname: 'My Todo List', numOfTask:0, isArchive:false}],
+    lists: [],
     addTask: function(input,listName) {
         let task = {
             id: 'task_' + Date.now(),
