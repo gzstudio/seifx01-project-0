@@ -1,8 +1,10 @@
 # seifx01-project-0
 
+project url : https://gzstudio.github.io/seifx01-project-0/
+
 This is a dead simple todo lists app. This todo app only allow user to have maximum of 20 pending todos at any given moment. It meant to be super simple and let you focus on the items you need to get done. 
 
-**Basic functionalities (MVP)**  
+**Features v.1**  
 [x] display task(s) on the todo  
 [x] add new task  
 [x] mark/unmark task as complete  
@@ -10,34 +12,45 @@ This is a dead simple todo lists app. This todo app only allow user to have maxi
 [x] remove task  
 [x] edit task  
 [x] empty state when there is no task  
-
+[x] multiple todo(s)  
+[x] firebase intergration  
 
 **Edge Cases**  
 [x] grammars (singular / plural)  
 [x] only display hide completed items / clear completed items when there are items  
-[x] limit items to max of 20  
-[x] prevent user from enter the same value  
 [x] prevent user from create empty task   
-[ ] optimised styling on mobile   
 
-**Advance functionalities**  
-[x] multiple todo(s)  
-    [x] Get the number of task to display
-    [ ] Editing of todo title
-[x] ability to save to local storage / firebase  
-[ ] animation & styling   
+**Tech used**  
+- javascript  
+- jquery  
+- bootstrap  
+- feather icon set  
+- firebase  
 
-**Other ideas**  
-[ ] ability to archive todo(s)  
-[ ] in-place edit  
-[ ] reordering of task  
-[ ] add sub-tasks  
-[ ] display % of subtask completed   
-[ ] automatically mark task as complete once all the sub-tasks are completed   
-[ ] assign / remove tag(s)  
-[ ] filter by tag(s)  
-[ ] assign due date to task  
-[ ] reminder  
-[ ] search  
+**v.2**  
+- user authentication  
+- mobile optimisation  
+- edit/remove list  
+
+**Ice box**  
+- task reordering  
+- sub-task  
+- ability to archive list  
+- tagging & filtering by tags  
+- due date & reminder  
+- search  
+
+
+**Known bugs**  
+- limiting 20 tasks per todo isn't working  
+- clear completed function isn't saved to firebase
+- task count does not display when application load  
+- sometimes task count got messed up
+- empty state doesn't display properly  
+- if you hide complete and refresh, application broke  
+- sometimes checkbox ended up having the same ID
+
+
+
 
 

@@ -71,9 +71,9 @@ db.collection("lists").orderBy("id").onSnapshot(snapshot => {
     changes.forEach(change => {
         if(change.type == 'added') {
             renderList(change.doc);
-            updateTodoCounter();
         }
     })
+    updateTodoCounter();
 })
 
 // Render tasks from firestore
@@ -103,7 +103,7 @@ function renderList(doc){
 
 // switch between different todos
 function switchTodoList(listName) {
-    $("#todo-body").html("");
+    $("#todo-body").html(`<h3 class="text-secondary text-center">This list is currently empty. <br/>Add some items :)</h3>`);
     $("#todo-title").html(listName);
 
     db.collection("tasks").where("list", '==', listName).onSnapshot(snapshot => {
@@ -111,10 +111,10 @@ function switchTodoList(listName) {
         changes.forEach(change => {
             if(change.type == 'added') {
                 renderTask(change.doc);
-                updateTodoCounter();
             } 
         })
     })
+    updateTodoCounter();
 };
 
 ///////////  -----  List / Task creator  -----  ///////////
@@ -141,9 +141,7 @@ function createTaskDiv(task) {
     $("#todo-body").append(taskWrapper);
 }
 
-
 ///////////  -----  Click Functions  -----  ///////////
-
 
 $(document).on("click", ".list-item", function() {
     let listName = $(this).children().html();
@@ -163,12 +161,11 @@ $("#addTask").click(function(event) {
   
     if (taskDescription.length > 0 && isError === true) {
         todo.addTask(taskDescription, listName);
-        updateTodoCounter();
         feather.replace();
     }
+    updateTodoCounter();
     $("#taskDescription").val("");
 });
-
 
 // add new list
 $("#addList").click(function(event) {
@@ -287,13 +284,12 @@ $(document).on("change", ":checkbox", function() {
         todo.tasks[index].isDone = true;
         db.collection("tasks").doc(id).update({isDone: true });
         $(this).parent().find(".feather-edit-2").css("visibility", "hidden");
-        updateTodoCounter();
     } else {
         todo.tasks[index].isDone = false;
         db.collection("tasks").doc(id).update({isDone: false });
-        $(this).parent().find(".feather-edit-2").css("visibility", "visible");
-        updateTodoCounter();
+        $(this).parent().find(".feather-edit-2").css("visibility", "visible"); 
     }
+    updateTodoCounter();
     $(this).parent().toggleClass("completed");
 });
 
@@ -317,7 +313,7 @@ function updateTodoCounter() {
     $("#todoLists").find($(`.list-name:contains(${currentList})`)).next().text(numOfPendingTodo);
 
   // Display empty state
-    if (taskInCurrentList.length > 0) {
+    if (taskInCurrentList.length >= 1) {
         $("#todo-body").find("h3").addClass("d-none");
     } else {
         $("#todo-body").find("h3").removeClass("d-none");
@@ -328,7 +324,6 @@ function updateTodoCounter() {
     } else {
         $("#numberTodo").html(`${numOfPendingTodo} todo items`);
     }
-
     $("#clearComplete").html(`Clear completed [${numOfDoneTodo}]`);
 
   // hide "Hide completed items" & "Clear completed" if no completed items.
