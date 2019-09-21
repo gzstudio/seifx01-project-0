@@ -17,8 +17,8 @@ let todo = {
             isDone: false,
             list: listName
             };
-        this.tasks.push(task);
         db.collection("tasks").add({id:'task_' + Date.now(),description: input, isDone: false, list: listName});
+        this.tasks.push(task);
         return task;
     },
     addList: function(input) {
@@ -28,8 +28,8 @@ let todo = {
             numOfTask: 0,
             isArchive: false
         };
-        this.lists.push(list);
         db.collection("lists").add({id:'list_' + Date.now(),listname: input, numOfTask: 0, isArchive: false});
+        this.lists.push(list);
         return list;
     }
 };
