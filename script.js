@@ -50,8 +50,9 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
     
-// Create an instance of our DB
-var db = firebase.firestore();
+// Create an instance of our DB & auth
+const db = firebase.firestore();
+const auth = firebase.auth();
 
 // Get the data from firebase
 db.collection("tasks").get().then((snapshot) => {
@@ -74,7 +75,7 @@ db.collection("lists").orderBy("id").onSnapshot(snapshot => {
         }
     })
     updateTodoCounter();
-})
+});
 
 // Render tasks from firestore
 function renderTask(doc){
@@ -101,22 +102,6 @@ function renderList(doc){
     $("#todoLists").append(listWrapper);
 };
 
-// switch between different todos
-function switchTodoList(listName) {
-    $("#todo-body").html(`<h3 class="text-secondary text-center">This list is currently empty. <br/>Add some items :)</h3>`);
-    $("#todo-title").html(listName);
-
-    db.collection("tasks").where("list", '==', listName).onSnapshot(snapshot => {
-        let changes = snapshot.docChanges();     
-        changes.forEach(change => {
-            if(change.type == 'added') {
-                renderTask(change.doc);
-            } 
-        })
-    })
-    updateTodoCounter();
-};
-
 ///////////  -----  List / Task creator  -----  ///////////
 
 function createListDiv(list) {
@@ -140,6 +125,23 @@ function createTaskDiv(task) {
     </div>`
     $("#todo-body").append(taskWrapper);
 }
+
+///////////  -----  switch between different todos  -----  ///////////
+
+function switchTodoList(listName) {
+    $("#todo-body").html(`<h3 class="text-secondary text-center">This list is currently empty. <br/>Add some items :)</h3>`);
+    $("#todo-title").html(listName);
+
+    db.collection("tasks").where("list", '==', listName).onSnapshot(snapshot => {
+        let changes = snapshot.docChanges();     
+        changes.forEach(change => {
+            if(change.type == 'added') {
+                renderTask(change.doc);
+            } 
+        })
+    })
+    updateTodoCounter();
+};
 
 ///////////  -----  Click Functions  -----  ///////////
 
